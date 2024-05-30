@@ -22,7 +22,7 @@ class Auth extends CI_Controller{
         $this->load->model('Mtopsis');
         $u = $this->input->post('username');
         $p = $this->input->post('password');
-        $auth = $this->db->get_where('admin', ['username' => $u])->row_array();
+        $auth = $this->db->get_where('admin', ['Username' => $u])->row_array(); // sesuaikan dengan nama kolom di tabel admin
         if (!$auth) {
             $this->session->set_flashdata('pesan', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
                     Username tidak ditemukan
@@ -32,8 +32,8 @@ class Auth extends CI_Controller{
                 </div>');
             redirect('auth');
         } else {
-            if (password_verify($p, $auth['password'])) {
-                $this->session->set_userdata('username', $auth['username']);
+            if (password_verify($p, $auth['Password'])) { // sesuaikan dengan nama kolom di tabel admin
+                $this->session->set_userdata('username', $auth['Username']); // sesuaikan dengan nama kolom di tabel admin
                 redirect('auth/dashboard');
             } else {
                 $this->session->set_flashdata('pesan', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -47,26 +47,28 @@ class Auth extends CI_Controller{
         }
     }
 }
-  public function proses_registrasi(){
-    $this->form_validation->set_rules('username', 'Username', 'required|trim', ['required' => 'Isi username lah bang']);
-    $this->form_validation->set_rules('password1', 'Password', 'required|trim|min_length[6]|matches[password2]', ['matches' => 'Password tidak sesuai', 'required' => 'Password Wajib diisi']);
-    $this->form_validation->set_rules('password2', 'Password', 'required|trim|matches[password1]');
 
-    if ($this->form_validation->run() == FALSE){
-        $this->load->view('admin/registrasi');
-    } else {
-        $data = [
-            'username' => $this->input->post('username'),
-            'password' => password_hash($this->input->post('password1'),PASSWORD_DEFAULT)
-        ];
+public function proses_registrasi(){
+  $this->form_validation->set_rules('username', 'Username', 'required|trim', ['required' => 'Isi username lah bang']);
+  $this->form_validation->set_rules('password1', 'Password', 'required|trim|min_length[6]|matches[password2]', ['matches' => 'Password tidak sesuai', 'required' => 'Password Wajib diisi']);
+  $this->form_validation->set_rules('password2', 'Password', 'required|trim|matches[password1]');
 
-        $this->db->insert('admin', $data);
+  if ($this->form_validation->run() == FALSE){
+      $this->load->view('admin/registrasi');
+  } else {
+      $data = [
+          'Username' => $this->input->post('username'),
+          'Password' => password_hash($this->input->post('password1'), PASSWORD_DEFAULT) 
+      ];
 
-        $this->session->set_flashdata('pesan', 'Registrasi berhasil. Silakan login.');
+      $this->db->insert('admin', $data);
 
-        redirect('auth');
-    }
+      $this->session->set_flashdata('pesan', 'Registrasi berhasil. Silakan login.');
+
+      redirect('auth');
   }
+}
+
   public function logout(){
     $this->session->sess_destroy();
     redirect('auth');
