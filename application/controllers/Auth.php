@@ -171,7 +171,7 @@ public function proses_registrasi(){
   public function insertKriteria() {
     $data = array(
       'NamaKriteria' => $this->input->post('nama_kriteria'),
-      'BobotKriteria' => $this->input->post('bobot'),
+      // 'BobotKriteria' => $this->input->post('bobot'),
       'Status' => $this->input->post('status')
     );
     $kriteria_id = $this->Mtopsis->insertKriteria($data);
@@ -400,6 +400,16 @@ public function proses_registrasi(){
     $this->load->view('admin/data/tampilnilaipreferensidanperingkat', $data);
     $this->load->view('admin/dashboard/footer');
   }
+
+ public function tampilPerbandingan(){
+  if (!$this->session->userdata('username')) {
+    redirect('auth');
+  }
+  $this->load->view('admin/dashboard/header');
+  $this->load->view('admin/dashboard/sidebar');
+  $this->load->view('admin/data/tampilPerbandingan');
+  $this->load->view('admin/dashboard/footer');
+}
 
 }
 ?>

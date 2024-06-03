@@ -2,10 +2,10 @@
     <div id="wrapper">
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-                <div class="sidebar-brand-icon rotate-n-15">
+                <!-- <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
-                </div>
-                <div class="sidebar-brand-text mx-3">Bento Kopi</div>
+                </div> -->
+                <div class="sidebar-brand-text mx-3">CV Kharisma Gina Dental Lab</div>
             </a>
             <hr class="sidebar-divider my-0">         
             <li class="nav-item active">
@@ -35,12 +35,29 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                    aria-expanded="true" aria-controls="collapseUtilities">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#perhitunganAHP"
+                    aria-expanded="true" aria-controls="perhitunganAHP">
                     <i class="fas fa-fw fa-wrench"></i>
-                    <span>Perhitungan</span>
+                    <span>Perhitungan AHP</span>
                 </a>
-                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
+                <div id="perhitunganAHP" class="collapse" aria-labelledby="headingUtilities"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Rincian Perhitungan:</h6>
+                        <a class="collapse-item" href="<?php echo site_url('auth/tampilPerbandingan')?>">Perbandingan</a>
+                        <!-- <a class="collapse-item" href="<?php echo site_url('auth/tampilIdeal')?>">Titik Ideal</a>
+                        <a class="collapse-item" href="<?php echo site_url('auth/tampilJarakKaryawan')?>">Jarak Ideal </a>
+                        <a class="collapse-item" href="<?php echo site_url('auth/tampilNilaiPreferensiDanPeringkat')?>">Preferensi dan Peringkat </a> -->
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#perhitunganTOPSIS"
+                    aria-expanded="true" aria-controls="perhitunganTOPSIS">
+                    <i class="fas fa-fw fa-wrench"></i>
+                    <span>Perhitungan Topsis</span>
+                </a>
+                <div id="perhitunganTOPSIS" class="collapse" aria-labelledby="headingUtilities"
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Rincian Perhitungan:</h6>

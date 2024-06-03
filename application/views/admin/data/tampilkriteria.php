@@ -11,7 +11,7 @@
 		<tr>
 			<th class="text-center">NO</th>
 			<th class="text-center">Nama Kriteria</th>
-			<th class="text-center">Bobot Kriteria</th>
+			<!-- <th class="text-center">Bobot Kriteria</th> -->
 			<th class="text-center">Status</th>
 			<th colspan="2" class="text-center">AKSI</th>
 		</tr>
@@ -22,7 +22,7 @@
 				<td><?php echo $no++ ?></td>
 				<td  style="display: none;"><?php echo $kri->ID_Kriteria ?></td>
 				<td><?php echo $kri->NamaKriteria ?></td>
-				<td><?php echo $kri->BobotKriteria ?></td>
+				<!-- <td><?php echo $kri->BobotKriteria ?></td> -->
 				<td><?php echo $kri->Status ?></td>
 				<td><?php echo anchor('auth/editKriteriaForm/'.$kri->ID_Kriteria,'<div class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></div>')?> edit</td>
 				<td><?php echo anchor('auth/deleteKriteria	/'.$kri->ID_Kriteria,'<div class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></div>') ?> hapus</td>
@@ -51,10 +51,10 @@
        		<input type="text" name="nama_kriteria" class="form-control">
        	</div>
 		
-       	<div class="form-group">
+       	<!-- <div class="form-group">
        		<label>Bobot Kriteria</label>
        		<input type="number" name="bobot" class="form-control" min="0" max="5">
-       	</div>
+       	</div> -->
 		<div class="form-goup">
 			<label>Status</label>
 			<select name="status" class="form-control">
