@@ -405,11 +405,80 @@ public function proses_registrasi(){
   if (!$this->session->userdata('username')) {
     redirect('auth');
   }
+  $data['kriteria'] = $this->Mtopsis->getKriteriaData();
+  $integritas = $this->Mtopsis->getIntegritasData();
+  $data['integritas'] = $integritas;
   $this->load->view('admin/dashboard/header');
   $this->load->view('admin/dashboard/sidebar');
-  $this->load->view('admin/data/tampilPerbandingan');
+  $this->load->view('admin/data/tampilPerbandingan',$data);
   $this->load->view('admin/dashboard/footer');
 }
 
+public function insertIntegritas() {
+  $data = array(
+      'nilai_integritas' => $this->input->post('nilai_integritas'),
+      'definisi' => $this->input->post('definisi'),
+  );
+  $id_integritas = $this->Mtopsis->insertIntegritas($data);
+  if ($id_integritas) {
+      $this->session->set_flashdata('messageintegritas', 
+        'Data Integritas berhasil ditambahkan dengan ID: ' . $id_integritas . '
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>');
+  } else {
+      $this->session->set_flashdata('messageintegritas', 'Gagal menambahkan data integritas.
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>');
+  }
+  redirect('auth/tampilPerbandingan');
+}
+public function editIntegritasForm($id_integritas) {
+  if (!$this->session->userdata('username')) {
+    redirect('auth');
+  }
+  $data['integritas'] = $this->Mtopsis->getIntegritasById($id_integritas);
+  $this->load->view('admin/dashboard/header');
+  $this->load->view('admin/dashboard/sidebar');
+  $this->load->view('admin/edit/editintegritas', $data); 
+  $this->load->view('admin/dashboard/footer');
+}
+public function updateIntegritas($id_integritas) {
+  $data = array(
+    'nilai_integritas' => $this->input->post('nilai_integritas'),
+      'definisi' => $this->input->post('definisi'),
+   
+  );
+  $result = $this->Mtopsis->updateIntegritas($id_integritas, $data);
+if ($result) {
+    $this->session->set_flashdata('messageintegritas', 
+      'Data Integritas berhasil di update
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>');
+} else {
+    $this->session->set_flashdata('messageintegritas', 'Gagal mengUpdate.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>');
+}
+  redirect('auth/tampilPerbandingan');
+}
+public function deleteIntegritas($id_integritas) {
+  $result = $this->Mtopsis->deleteIntegritas($id_integritas);
+  if ($result) {
+      $this->session->set_flashdata('messageintegritas', 'Data integritas berhasil dihapus.
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>');
+  } else {
+      $this->session->set_flashdata('messageintegritas', 'Gagal menghapus data integritas..
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>');
+  }
+  redirect('auth/tampilPerbandingan');
+}
 }
 ?>

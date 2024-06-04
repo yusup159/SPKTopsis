@@ -355,5 +355,25 @@ class Mtopsis extends CI_Model{
         return $nilaiPreferensiSetiapKaryawan;
     }
 
+    public function getIntegritasData() {
+        return $this->db->get('integritas')->result();
+    }
 
+    public function insertIntegritas($data) {
+        $this->db->insert('integritas', $data);
+        return $this->db->insert_id();
+    }
+    public function getIntegritasById($id_integritas) {
+        return $this->db->get_where('integritas', array('id_integritas' => $id_integritas))->row();
+    }
+    public function updateIntegritas($id_integritas, $data) {
+        $this->db->where('id_integritas', $id_integritas);
+        return $this->db->update('integritas', $data);
+    }
+    public function deleteIntegritas($id_integritas) {
+      
+            $this->db->where('id_integritas', $id_integritas);
+            return $this->db->delete('integritas');
+     
+    }
 }
