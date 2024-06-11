@@ -27,7 +27,7 @@ class Auth extends CI_Controller
       $this->load->model('Mtopsis');
       $u = $this->input->post('username');
       $p = $this->input->post('password');
-      $auth = $this->db->get_where('admin', ['Username' => $u])->row_array(); // sesuaikan dengan nama kolom di tabel admin
+      $auth = $this->db->get_where('admin', ['Username' => $u])->row_array();
       if (!$auth) {
         $this->session->set_flashdata('pesan', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
                     Username tidak ditemukan
@@ -37,8 +37,8 @@ class Auth extends CI_Controller
                 </div>');
         redirect('auth');
       } else {
-        if (password_verify($p, $auth['Password'])) { // sesuaikan dengan nama kolom di tabel admin
-          $this->session->set_userdata('username', $auth['Username']); // sesuaikan dengan nama kolom di tabel admin
+        if (password_verify($p, $auth['Password'])) {
+          $this->session->set_userdata('username', $auth['Username']);
           redirect('auth/dashboard');
         } else {
           $this->session->set_flashdata('pesan', '<div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -190,7 +190,6 @@ class Auth extends CI_Controller
   {
     $data = array(
       'NamaKriteria' => $this->input->post('nama_kriteria'),
-      // 'BobotKriteria' => $this->input->post('bobot'),
       'Status' => $this->input->post('status')
     );
     $kriteria_id = $this->Mtopsis->insertKriteria($data);
@@ -209,7 +208,7 @@ class Auth extends CI_Controller
             </button>');
     }
 
-    redirect('auth/tampil_kriteria');
+    redirect('auth/insertPerbandingan');
   }
   public function editKriteriaForm($kriteria_id)
   {
@@ -339,9 +338,9 @@ class Auth extends CI_Controller
   public function deleteKriteria($kriteria_id)
   {
     $isUsedInMatrix = $this->Mtopsis->checkKriteriaUsageInMatrix($kriteria_id);
-    $isUsedInBobotNormalisasi = $this->Mtopsis->checkKriteriaUsageInBobotNormalisasi($kriteria_id);
 
-    if (!$isUsedInMatrix && !$isUsedInBobotNormalisasi) {
+
+    if (!$isUsedInMatrix) {
       $result = $this->Mtopsis->deleteKriteria($kriteria_id);
 
       if ($result) {
@@ -439,7 +438,13 @@ class Auth extends CI_Controller
       redirect('auth');
     }
     $data['kriteria'] = $this->Mtopsis->getKriteriaData();
-    $data['integritas'] =$this->Mtopsis->getIntegritasData();
+    $db_perbandingan = $this->Mtopsis->getPerbandinganKriteria();
+    $nilai_perbandingan = array();
+    foreach ($db_perbandingan as $row) {
+      $nilai_perbandingan[$row->ID_Kriteria1][$row->ID_Kriteria2] = $row->nilai;
+    }
+    $data['integritas'] = $this->Mtopsis->getIntegritasData();
+    $data['nilai_perbandingan'] = $nilai_perbandingan;
     $this->load->view('admin/dashboard/header');
     $this->load->view('admin/dashboard/sidebar');
     $this->load->view('admin/data/tampilPerbandingan', $data);
@@ -520,16 +525,134 @@ class Auth extends CI_Controller
     }
     redirect('auth/tampilPerbandingan');
   }
+
+
   public function insertPerbandingan()
   {
     if (!$this->session->userdata('username')) {
       redirect('auth');
     }
     $data['kriteria'] = $this->Mtopsis->getKriteriaData();
-    $data['integritas'] =$this->Mtopsis->getIntegritasData();
+    $db_perbandingan = $this->Mtopsis->getPerbandinganKriteria();
+    $nilai_perbandingan = array();
+    foreach ($db_perbandingan as $row) {
+      $nilai_perbandingan[$row->ID_Kriteria1][$row->ID_Kriteria2] = $row->nilai;
+    }
+    $data['integritas'] = $this->Mtopsis->getIntegritasData();
+    $data['nilai_perbandingan'] = $nilai_perbandingan;
     $this->load->view('admin/dashboard/header');
     $this->load->view('admin/dashboard/sidebar');
-    $this->load->view('admin/data/tambahperbandingan',$data);
+    $this->load->view('admin/data/tambahperbandingan', $data);
     $this->load->view('admin/dashboard/footer');
+  }
+
+  public function hitung_bobot()
+  {
+
+    $kriteria = $this->Mtopsis->getKriteriaData();
+    $nilai_perbandingan = $this->input->post('nilai');
+
+
+    $id_kriteria_asli = array();
+    foreach ($kriteria as $index => $k) {
+      $id_kriteria_asli[$index] = $k->ID_Kriteria;
+    }
+
+
+    $n = count($id_kriteria_asli);
+    $matriks_perbandingan = array_fill(0, $n, array_fill(0, $n, 1));
+
+    if ($nilai_perbandingan) {
+
+      foreach ($id_kriteria_asli as $i => $id1) {
+        foreach ($id_kriteria_asli as $j => $id2) {
+          if ($id1 != $id2) {
+            $data = array(
+              'ID_Kriteria1' => $id1,
+              'ID_Kriteria2' => $id2,
+              'nilai' => $nilai_perbandingan[$id1][$id2]
+            );
+            $this->Mtopsis->insertPerbandinganKriteria($data);
+          }
+        }
+      }
+    }
+
+
+    $db_perbandingan = $this->Mtopsis->getPerbandinganKriteria();
+    foreach ($db_perbandingan as $row) {
+      $i = array_search($row->ID_Kriteria1, $id_kriteria_asli);
+      $j = array_search($row->ID_Kriteria2, $id_kriteria_asli);
+      $matriks_perbandingan[$i][$j] = $row->nilai;
+      $matriks_perbandingan[$j][$i] = 1 / $row->nilai;
+    }
+
+
+    $total_kolom = array_fill(0, $n, 0);
+    for ($j = 0; $j < $n; $j++) {
+      for ($i = 0; $i < $n; $i++) {
+        $total_kolom[$j] += $matriks_perbandingan[$i][$j];
+      }
+    }
+
+    $matriks_normalisasi = array_fill(0, $n, array_fill(0, $n, 0));
+    for ($i = 0; $i < $n; $i++) {
+      for ($j = 0; $j < $n; $j++) {
+        $matriks_normalisasi[$i][$j] = $matriks_perbandingan[$i][$j] / $total_kolom[$j];
+      }
+    }
+
+
+    $bobot_kriteria = array_fill(0, $n, 0);
+    for ($i = 0; $i < $n; $i++) {
+      for ($j = 0; $j < $n; $j++) {
+        $bobot_kriteria[$i] += $matriks_normalisasi[$i][$j];
+      }
+      $bobot_kriteria[$i] /= $n;
+    }
+
+
+    $lambda_max = 0;
+    for ($i = 0; $i < $n; $i++) {
+      $sum = 0;
+      for ($j = 0; $j < $n; $j++) {
+        $sum += $matriks_perbandingan[$i][$j] * $bobot_kriteria[$j];
+      }
+      $lambda_max += $sum / $bobot_kriteria[$i];
+    }
+    $lambda_max /= $n;
+
+    $ci = ($lambda_max - $n) / ($n - 1);
+
+
+    $ri_values = [0, 0, 0.58, 0.9, 1.12, 1.24, 1.32, 1.41, 1.45, 1.49];
+    $ri = $ri_values[$n - 1];
+
+    $cr = $ci / $ri;
+
+
+    $data['kriteria'] = $kriteria;
+    $data['bobot_kriteria'] = array_combine($id_kriteria_asli, $bobot_kriteria);
+    $data['nilai_perbandingan'] = $nilai_perbandingan;
+    $data['ci'] = $ci;
+    $data['cr'] = $cr;
+    $data['ri'] = $ri;
+
+    $this->load->view('admin/dashboard/header');
+    $this->load->view('admin/dashboard/sidebar');
+    $this->load->view('admin/data/hasilAHP', $data);
+    $this->load->view('admin/dashboard/footer');
+  }
+
+  public function updateBobot()
+  {
+    $id_kriteria = $this->input->post('id_kriteria');
+    $bobot_kriteria = $this->input->post('bobot_kriteria');
+
+    for ($i = 0; $i < count($id_kriteria); $i++) {
+      $this->Mtopsis->update_bobot($id_kriteria[$i], $bobot_kriteria[$i]);
+    }
+
+    redirect('auth/tampil_kriteria');
   }
 }

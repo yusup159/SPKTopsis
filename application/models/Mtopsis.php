@@ -1,73 +1,91 @@
 <?php
-class Mtopsis extends CI_Model{
+class Mtopsis extends CI_Model
+{
 
 
-    public function cek_login($u,$p){
-        $q = $this->db->get_where('admin',array('username '=>$u,'password'=>$p));
+    public function cek_login($u, $p)
+    {
+        $q = $this->db->get_where('admin', array('username ' => $u, 'password' => $p));
         return $q;
     }
-    public function getKaryawanData() {
+    public function getKaryawanData()
+    {
         return $this->db->get('karyawan')->result();
     }
-    public function getKriteriaData() {
+    public function getKriteriaData()
+    {
         return $this->db->get('kriteria')->result();
     }
-    public function getMatrixData() {
+    public function getMatrixData()
+    {
         $this->db->select('Matrix.*, Karyawan.NamaKaryawan, Kriteria.NamaKriteria');
         $this->db->from('Matrix');
         $this->db->join('Karyawan', 'Karyawan.ID_Karyawan = Matrix.ID_Karyawan');
         $this->db->join('Kriteria', 'Kriteria.ID_Kriteria = Matrix.ID_Kriteria');
         return $this->db->get()->result();
     }
-    public function insertKaryawan($data) {
+    public function insertKaryawan($data)
+    {
         $this->db->insert('Karyawan', $data);
         return $this->db->insert_id();
     }
-    public function getKaryawanById($karyawan_id) {
+    public function getKaryawanById($karyawan_id)
+    {
         return $this->db->get_where('Karyawan', array('ID_Karyawan' => $karyawan_id))->row();
     }
-    public function updateKaryawan($karyawan_id, $data) {
+    public function updateKaryawan($karyawan_id, $data)
+    {
         $this->db->where('ID_Karyawan', $karyawan_id);
         return $this->db->update('Karyawan', $data);
     }
-    public function insertKriteria($data) {
+    public function insertKriteria($data)
+    {
         $this->db->insert('Kriteria', $data);
         return $this->db->insert_id();
     }
-    public function getKriteriaById($kriteria_id) {
+    public function getKriteriaById($kriteria_id)
+    {
         return $this->db->get_where('Kriteria', array('ID_Kriteria' => $kriteria_id))->row();
     }
-    public function updateKriteria($kriteria_id, $data) {
+    public function updateKriteria($kriteria_id, $data)
+    {
         $this->db->where('ID_Kriteria', $kriteria_id);
         return $this->db->update('Kriteria', $data);
     }
-    public function getKaryawanByName($nama_karyawan) {
+    public function getKaryawanByName($nama_karyawan)
+    {
         $this->db->like('NamaKaryawan', $nama_karyawan);
         return $this->db->get('Karyawan')->result();
     }
-    public function getKriteriaByName($nama_kriteria) {
+    public function getKriteriaByName($nama_kriteria)
+    {
         $this->db->like('NamaKriteria', $nama_kriteria);
         return $this->db->get('Kriteria')->result();
     }
-    public function insertMatrix($data) {
+    public function insertMatrix($data)
+    {
         $this->db->insert('Matrix', $data);
         return $this->db->insert_id();
     }
-    public function getMatrixById($matrix_id) {
+    public function getMatrixById($matrix_id)
+    {
         return $this->db->get_where('Matrix', array('ID_Matrix' => $matrix_id))->row();
-    }   
-    public function updateMatrix($matrix_id, $data) {
+    }
+    public function updateMatrix($matrix_id, $data)
+    {
         $this->db->where('ID_Matrix', $matrix_id);
-        $result = $this->db->update('matrix', array('Nilai' => $data['Nilai']));  
+        $result = $this->db->update('matrix', array('Nilai' => $data['Nilai']));
         return $result;
     }
-    public function checkKaryawanUsage($karyawan_id) {
+    public function checkKaryawanUsage($karyawan_id)
+    {
         $this->db->where('ID_Karyawan', $karyawan_id);
         $result = $this->db->get('Matrix')->row();
-    
+
         return ($result) ? true : false;
-    } 
-    public function deleteKaryawan($karyawan_id) {
+    }
+    public function deleteKaryawan($karyawan_id)
+    {
         if (!$this->checkKaryawanUsage($karyawan_id)) {
             $this->db->where('ID_Karyawan', $karyawan_id);
             return $this->db->delete('karyawan');
@@ -75,42 +93,42 @@ class Mtopsis extends CI_Model{
             return false;
         }
     }
-    public function checkKriteriaUsageInMatrix($kriteria_id) {
+    public function checkKriteriaUsageInMatrix($kriteria_id)
+    {
         $this->db->where('ID_Kriteria', $kriteria_id);
         $result = $this->db->get('Matrix')->row();
         return ($result) ? true : false;
-    } 
-    public function checkKriteriaUsageInBobotNormalisasi($kriteria_id) {
-        $this->db->where('ID_Kriteria', $kriteria_id);
-        $result = $this->db->get('bobotnormalisasi')->row();
-    
-        return ($result) ? true : false;
-    }        
-    public function deleteKriteria($kriteria_id) {
+    }
+
+    public function deleteKriteria($kriteria_id)
+    {
         $isUsedInMatrix = $this->checkKriteriaUsageInMatrix($kriteria_id);
-        $isUsedInBobotNormalisasi = $this->checkKriteriaUsageInBobotNormalisasi($kriteria_id);
-    
-        if (!$isUsedInMatrix && !$isUsedInBobotNormalisasi) {
+
+
+        if (!$isUsedInMatrix) {
             $this->db->where('ID_Kriteria', $kriteria_id);
             return $this->db->delete('kriteria');
         } else {
             return false;
         }
     }
-    public function deleteMatrix($matrix_id) {
+    public function deleteMatrix($matrix_id)
+    {
         $this->db->where('ID_Matrix', $matrix_id);
         return $this->db->delete('Matrix');
-      }
-      public function isMatrixExists($id_karyawan, $id_kriteria) {
+    }
+    public function isMatrixExists($id_karyawan, $id_kriteria)
+    {
         $this->db->where('ID_Karyawan', $id_karyawan);
         $this->db->where('ID_Kriteria', $id_kriteria);
         $query = $this->db->get('matrix');
         return $query->num_rows() > 0;
     }
-    public function nilaiMatrixExists($id_karyawan, $id_kriteria, $matrix_id) {
+    public function nilaiMatrixExists($id_karyawan, $id_kriteria, $matrix_id)
+    {
         $this->db->where('ID_Karyawan', $id_karyawan);
         $this->db->where('ID_Kriteria', $id_kriteria);
-        $this->db->where('ID_Matrix !=', $matrix_id); 
+        $this->db->where('ID_Matrix !=', $matrix_id);
         $query = $this->db->get('matrix');
         return $query->num_rows() > 0;
     }
@@ -171,7 +189,7 @@ class Mtopsis extends CI_Model{
 
         return array_values($normalizedMatrix);
     }
-    
+
     public function matrixTerbobot()
     {
         $kriteriaData = $this->getKriteria();
@@ -223,7 +241,7 @@ class Mtopsis extends CI_Model{
             $idealPositif[] = [
                 'Kriteria' => $kriteria->NamaKriteria,
                 'IdealPositif' => $minKaryawan,
-                'NilaiBobotTerbobot' => $minValue, 
+                'NilaiBobotTerbobot' => $minValue,
             ];
         }
         return $idealPositif;
@@ -248,7 +266,7 @@ class Mtopsis extends CI_Model{
             $idealNegatif[] = [
                 'Kriteria' => $kriteria->NamaKriteria,
                 'IdealNegatif' => $minKaryawan,
-                'NilaiBobotTerbobot' => $minValue, 
+                'NilaiBobotTerbobot' => $minValue,
             ];
         }
         foreach ($kriteriaCost as $kriteria) {
@@ -265,7 +283,7 @@ class Mtopsis extends CI_Model{
             $idealNegatif[] = [
                 'Kriteria' => $kriteria->NamaKriteria,
                 'IdealNegatif' => $maxKaryawan,
-                'NilaiBobotTerbobot' => $maxValue, 
+                'NilaiBobotTerbobot' => $maxValue,
             ];
         }
         return $idealNegatif;
@@ -301,26 +319,26 @@ class Mtopsis extends CI_Model{
         $idealNegatif = $this->idealNegatif();
         $matrixTerbobot = $this->matrixTerbobot();
         $jarakSetiapKaryawan = [];
-            foreach ($matrixTerbobot as $row) {
-                $jarak = 0;
-                foreach ($row['values'] as $index => $nilai) {
-                    $idealValue = 0;
-                    foreach ($idealNegatif as $ideal) {
-                        if ($ideal['Kriteria'] == $nilai['NamaKriteria']) {
-                            $idealValue = $ideal['NilaiBobotTerbobot'];
-                            break;
-                        }
+        foreach ($matrixTerbobot as $row) {
+            $jarak = 0;
+            foreach ($row['values'] as $index => $nilai) {
+                $idealValue = 0;
+                foreach ($idealNegatif as $ideal) {
+                    if ($ideal['Kriteria'] == $nilai['NamaKriteria']) {
+                        $idealValue = $ideal['NilaiBobotTerbobot'];
+                        break;
                     }
-                    $jarak += pow($nilai['BobotTerbobot'] - $idealValue, 2);
                 }
-                $totalJarak = sqrt($jarak);
-                $jarakSetiapKaryawan[] = [
-                    'ID_Karyawan' => $row['ID_Karyawan'],
-                    'NamaKaryawan' => $row['NamaKaryawan'],
-                    'JarakIdealNegatif' => $totalJarak,
-                ];
+                $jarak += pow($nilai['BobotTerbobot'] - $idealValue, 2);
+            }
+            $totalJarak = sqrt($jarak);
+            $jarakSetiapKaryawan[] = [
+                'ID_Karyawan' => $row['ID_Karyawan'],
+                'NamaKaryawan' => $row['NamaKaryawan'],
+                'JarakIdealNegatif' => $totalJarak,
+            ];
         }
-            return $jarakSetiapKaryawan;
+        return $jarakSetiapKaryawan;
     }
     public function hitungNilaiPreferensiSetiapKaryawan()
     {
@@ -340,7 +358,7 @@ class Mtopsis extends CI_Model{
             ];
         }
         return $nilaiPreferensiSetiapKaryawan;
-    }    
+    }
     public function peringkatKaryawan()
     {
         $nilaiPreferensiSetiapKaryawan = $this->hitungNilaiPreferensiSetiapKaryawan();
@@ -355,25 +373,49 @@ class Mtopsis extends CI_Model{
         return $nilaiPreferensiSetiapKaryawan;
     }
 
-    public function getIntegritasData() {
+    public function getIntegritasData()
+    {
         return $this->db->get('integritas')->result();
     }
 
-    public function insertIntegritas($data) {
+    public function insertIntegritas($data)
+    {
         $this->db->insert('integritas', $data);
         return $this->db->insert_id();
     }
-    public function getIntegritasById($id_integritas) {
+    public function getIntegritasById($id_integritas)
+    {
         return $this->db->get_where('integritas', array('id_integritas' => $id_integritas))->row();
     }
-    public function updateIntegritas($id_integritas, $data) {
+    public function updateIntegritas($id_integritas, $data)
+    {
         $this->db->where('id_integritas', $id_integritas);
         return $this->db->update('integritas', $data);
     }
-    public function deleteIntegritas($id_integritas) {
-      
-            $this->db->where('id_integritas', $id_integritas);
-            return $this->db->delete('integritas');
-     
+    public function deleteIntegritas($id_integritas)
+    {
+
+        $this->db->where('id_integritas', $id_integritas);
+        return $this->db->delete('integritas');
+    }
+    public function insertPerbandinganKriteria($data)
+    {
+        $this->db->insert('perbandingankriteria', $data);
+    }
+
+    public function getPerbandinganKriteria()
+    {
+        $this->db->select('*');
+        $this->db->from('perbandingankriteria');
+        $query = $this->db->get();
+        return $query->result();
+    }
+    public function update_bobot($id_kriteria, $bobot)
+    {
+        $data = array(
+            'BobotKriteria' => $bobot
+        );
+        $this->db->where('ID_Kriteria', $id_kriteria);
+        $this->db->update('kriteria', $data);
     }
 }

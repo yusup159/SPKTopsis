@@ -6,20 +6,28 @@
         <div class="col">
             <a href="<?php echo site_url('auth/insertPerbandingan')?>"><button class="btn btn-sm btn-primary mb-3"><i class="fas fa-plus fa-sm"></i>Tambah </button></a>
             <table class="table table-bordered">
-                <thead>
-                    <th></th>
-                    <?php foreach ($kriteria as $kri) : ?>
-                        <th class="text-center"><?= $kri->NamaKriteria ?></th>
-                    <?php endforeach; ?>
-                </thead>
-                <tbody>
-                    <?php foreach ($kriteria as $kri) : ?>
-                        <tr>
-                            <td class="text-center"><?= $kri->NamaKriteria ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+    <thead>
+        <tr>
+            <th>Kriteria</th>
+            <?php foreach ($kriteria as $k) : ?>
+                <th><?php echo $k->NamaKriteria; ?></th>
+            <?php endforeach; ?>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($kriteria as $k1) : ?>
+            <tr>
+                <td><?php echo $k1->NamaKriteria; ?></td>
+                <?php foreach ($kriteria as $k2) : ?>
+                    <td>
+                        <?php echo isset($nilai_perbandingan[$k1->ID_Kriteria][$k2->ID_Kriteria]) ? $nilai_perbandingan[$k1->ID_Kriteria][$k2->ID_Kriteria] : 1; ?>
+                    </td>
+                <?php endforeach; ?>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
         </div>
         <div class="col">
             <?php if ($this->session->flashdata('messageintegritas')) : ?>
@@ -47,7 +55,7 @@
                         </tr>
                     <?php endforeach; ?>
                     <tr>
-                        <td>tes</td>
+                        <td class="text-center" >tes</td>
                         <td>tesaja</td>
                     </tr>
                 </tbody>
