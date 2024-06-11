@@ -400,8 +400,22 @@ class Mtopsis extends CI_Model
     }
     public function insertPerbandinganKriteria($data)
     {
-        $this->db->insert('perbandingankriteria', $data);
+
+        $this->db->where('ID_Kriteria1', $data['ID_Kriteria1']);
+        $this->db->where('ID_Kriteria2', $data['ID_Kriteria2']);
+        $query = $this->db->get('perbandingankriteria');
+
+        if ($query->num_rows() > 0) {
+
+            $this->db->where('ID_Kriteria1', $data['ID_Kriteria1']);
+            $this->db->where('ID_Kriteria2', $data['ID_Kriteria2']);
+            $this->db->update('perbandingankriteria', $data);
+        } else {
+
+            $this->db->insert('perbandingankriteria', $data);
+        }
     }
+
 
     public function getPerbandinganKriteria()
     {

@@ -46,8 +46,12 @@
                     </tr>
                 <?php endforeach; ?>
                 <tr>
-                    <td class="text-center">tes</td>
-                    <td>tesaja</td>
+                    <td class="text-center">2,4,6,8</td>
+                    <td>Nilai diantara dua penilaian yang berdekatan</td>
+                </tr>
+                <tr>
+                    <td class="text-center">Resiprokal</td>
+                    <td>Jika elemen I memiliki salah satu angka di atas dibandingkan elemen j, maka j memiliki nilai kebalikannya ketika dibanding dengan i</td>
                 </tr>
             </tbody>
         </table>

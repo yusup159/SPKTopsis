@@ -4,29 +4,29 @@
     <br>
     <div class="row">
         <div class="col">
-            <a href="<?php echo site_url('auth/insertPerbandingan')?>"><button class="btn btn-sm btn-primary mb-3"><i class="fas fa-plus fa-sm"></i>Tambah </button></a>
+            <a href="<?php echo site_url('auth/insertPerbandingan') ?>"><button class="btn btn-sm btn-primary mb-3"><i class="fas fa-plus fa-sm"></i>Ubah </button></a>
             <table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Kriteria</th>
-            <?php foreach ($kriteria as $k) : ?>
-                <th><?php echo $k->NamaKriteria; ?></th>
-            <?php endforeach; ?>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($kriteria as $k1) : ?>
-            <tr>
-                <td><?php echo $k1->NamaKriteria; ?></td>
-                <?php foreach ($kriteria as $k2) : ?>
-                    <td>
-                        <?php echo isset($nilai_perbandingan[$k1->ID_Kriteria][$k2->ID_Kriteria]) ? $nilai_perbandingan[$k1->ID_Kriteria][$k2->ID_Kriteria] : 1; ?>
-                    </td>
-                <?php endforeach; ?>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+                <thead>
+                    <tr>
+                        <th>Kriteria</th>
+                        <?php foreach ($kriteria as $k) : ?>
+                            <th><?php echo $k->NamaKriteria; ?></th>
+                        <?php endforeach; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($kriteria as $k1) : ?>
+                        <tr>
+                            <td><?php echo $k1->NamaKriteria; ?></td>
+                            <?php foreach ($kriteria as $k2) : ?>
+                                <td>
+                                    <?php echo isset($nilai_perbandingan[$k1->ID_Kriteria][$k2->ID_Kriteria]) ? $nilai_perbandingan[$k1->ID_Kriteria][$k2->ID_Kriteria] : 1; ?>
+                                </td>
+                            <?php endforeach; ?>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
 
         </div>
         <div class="col">
@@ -55,8 +55,12 @@
                         </tr>
                     <?php endforeach; ?>
                     <tr>
-                        <td class="text-center" >tes</td>
-                        <td>tesaja</td>
+                        <td class="text-center">2,4,6,8</td>
+                        <td>Nilai diantara dua penilaian yang berdekatan</td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">Resiprokal</td>
+                        <td>Jika elemen I memiliki salah satu angka di atas dibandingkan elemen j, maka j memiliki nilai kebalikannya ketika dibanding dengan i</td>
                     </tr>
                 </tbody>
             </table>

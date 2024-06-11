@@ -548,29 +548,27 @@ class Auth extends CI_Controller
 
   public function hitung_bobot()
   {
-
     $kriteria = $this->Mtopsis->getKriteriaData();
     $nilai_perbandingan = $this->input->post('nilai');
-
 
     $id_kriteria_asli = array();
     foreach ($kriteria as $index => $k) {
       $id_kriteria_asli[$index] = $k->ID_Kriteria;
     }
 
-
     $n = count($id_kriteria_asli);
     $matriks_perbandingan = array_fill(0, $n, array_fill(0, $n, 1));
 
     if ($nilai_perbandingan) {
-
       foreach ($id_kriteria_asli as $i => $id1) {
         foreach ($id_kriteria_asli as $j => $id2) {
           if ($id1 != $id2) {
+            $nilai = $nilai_perbandingan[$id1][$id2];
+            $nilai = $nilai == 0 ? 1 : $nilai;
             $data = array(
               'ID_Kriteria1' => $id1,
               'ID_Kriteria2' => $id2,
-              'nilai' => $nilai_perbandingan[$id1][$id2]
+              'nilai' => $nilai
             );
             $this->Mtopsis->insertPerbandinganKriteria($data);
           }
@@ -578,13 +576,13 @@ class Auth extends CI_Controller
       }
     }
 
-
     $db_perbandingan = $this->Mtopsis->getPerbandinganKriteria();
     foreach ($db_perbandingan as $row) {
       $i = array_search($row->ID_Kriteria1, $id_kriteria_asli);
       $j = array_search($row->ID_Kriteria2, $id_kriteria_asli);
-      $matriks_perbandingan[$i][$j] = $row->nilai;
-      $matriks_perbandingan[$j][$i] = 1 / $row->nilai;
+      $nilai = $row->nilai == 0 ? 1 : $row->nilai;
+      $matriks_perbandingan[$i][$j] = $nilai;
+      $matriks_perbandingan[$j][$i] = 1 / $nilai;
     }
 
 
@@ -594,6 +592,7 @@ class Auth extends CI_Controller
         $total_kolom[$j] += $matriks_perbandingan[$i][$j];
       }
     }
+
 
     $matriks_normalisasi = array_fill(0, $n, array_fill(0, $n, 0));
     for ($i = 0; $i < $n; $i++) {
@@ -622,14 +621,11 @@ class Auth extends CI_Controller
     }
     $lambda_max /= $n;
 
+
     $ci = ($lambda_max - $n) / ($n - 1);
-
-
     $ri_values = [0, 0, 0.58, 0.9, 1.12, 1.24, 1.32, 1.41, 1.45, 1.49];
-    $ri = $ri_values[$n - 1];
-
-    $cr = $ci / $ri;
-
+    $ri = isset($ri_values[$n - 1]) ? $ri_values[$n - 1] : 0;
+    $cr = $ri != 0 ? $ci / $ri : 0;
 
     $data['kriteria'] = $kriteria;
     $data['bobot_kriteria'] = array_combine($id_kriteria_asli, $bobot_kriteria);
@@ -643,6 +639,7 @@ class Auth extends CI_Controller
     $this->load->view('admin/data/hasilAHP', $data);
     $this->load->view('admin/dashboard/footer');
   }
+
 
   public function updateBobot()
   {
