@@ -9,12 +9,13 @@
             </tr>
         </thead>
         <tbody>
-            <?php 
-            $no =1;foreach ($jarakSetiapKaryawan as $karyawan): ?>
+            <?php
+            $no = 1;
+            foreach ($jarakSetiapKaryawan as $karyawan) : ?>
                 <tr>
                     <td><?php echo $no++ ?></td>
                     <td><?php echo $karyawan['NamaKaryawan']; ?></td>
-                    <td class="text-center"><?php echo number_format( $karyawan['JarakIdealPositif'], 7); ?></td>
+                    <td class="text-center"><?php echo number_format($karyawan['JarakIdealPositif'], 4); ?></td>
 
                 </tr>
             <?php endforeach; ?>
@@ -32,22 +33,14 @@
             </tr>
         </thead>
         <tbody>
-            <?php $no =1; foreach ($jarakNegatifSetiapKaryawan as $karyawan): ?>
+            <?php $no = 1;
+            foreach ($jarakNegatifSetiapKaryawan as $karyawan) : ?>
                 <tr>
                     <td><?php echo $no++ ?></td>
                     <td><?php echo $karyawan['NamaKaryawan']; ?></td>
-                    <td class="text-center"><?php echo number_format( $karyawan['JarakIdealNegatif'], 7); ?></td>
+                    <td class="text-center"><?php echo number_format($karyawan['JarakIdealNegatif'], 4); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
 </div>
-
-
-
-
-
-
-
-
-

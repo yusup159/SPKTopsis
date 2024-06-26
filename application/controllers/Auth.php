@@ -208,7 +208,7 @@ class Auth extends CI_Controller
             </button>');
     }
 
-    redirect('auth/insertPerbandingan');
+    redirect('auth/tampil_kriteria');
   }
   public function editKriteriaForm($kriteria_id)
   {
@@ -225,7 +225,6 @@ class Auth extends CI_Controller
   {
     $data = array(
       'NamaKriteria' => $this->input->post('nama_kriteria'),
-      'BobotKriteria' => $this->input->post('bobot'),
       'Status' => $this->input->post('status'),
     );
     $result = $this->Mtopsis->updateKriteria($kriteria_id, $data);
@@ -432,22 +431,15 @@ class Auth extends CI_Controller
     $this->load->view('admin/dashboard/footer');
   }
 
-  public function tampilPerbandingan()
+  public function tampilIntegritas()
   {
     if (!$this->session->userdata('username')) {
       redirect('auth');
     }
-    $data['kriteria'] = $this->Mtopsis->getKriteriaData();
-    $db_perbandingan = $this->Mtopsis->getPerbandinganKriteria();
-    $nilai_perbandingan = array();
-    foreach ($db_perbandingan as $row) {
-      $nilai_perbandingan[$row->ID_Kriteria1][$row->ID_Kriteria2] = $row->nilai;
-    }
     $data['integritas'] = $this->Mtopsis->getIntegritasData();
-    $data['nilai_perbandingan'] = $nilai_perbandingan;
     $this->load->view('admin/dashboard/header');
     $this->load->view('admin/dashboard/sidebar');
-    $this->load->view('admin/data/tampilPerbandingan', $data);
+    $this->load->view('admin/data/tampilintegritas', $data);
     $this->load->view('admin/dashboard/footer');
   }
 
@@ -472,7 +464,7 @@ class Auth extends CI_Controller
               <span aria-hidden="true">&times;</span>
           </button>');
     }
-    redirect('auth/tampilPerbandingan');
+    redirect('auth/tampilIntegritas');
   }
   public function editIntegritasForm($id_integritas)
   {
@@ -507,7 +499,7 @@ class Auth extends CI_Controller
             <span aria-hidden="true">&times;</span>
         </button>');
     }
-    redirect('auth/tampilPerbandingan');
+    redirect('auth/tampilIntegritas');
   }
   public function deleteIntegritas($id_integritas)
   {
@@ -523,26 +515,36 @@ class Auth extends CI_Controller
               <span aria-hidden="true">&times;</span>
           </button>');
     }
-    redirect('auth/tampilPerbandingan');
+    redirect('auth/tampilIntegritas');
   }
-
-
-  public function insertPerbandingan()
+  public function PerbandinganBerpasanagn()
   {
-    if (!$this->session->userdata('username')) {
-      redirect('auth');
-    }
-    $data['kriteria'] = $this->Mtopsis->getKriteriaData();
-    $db_perbandingan = $this->Mtopsis->getPerbandinganKriteria();
-    $nilai_perbandingan = array();
-    foreach ($db_perbandingan as $row) {
-      $nilai_perbandingan[$row->ID_Kriteria1][$row->ID_Kriteria2] = $row->nilai;
-    }
+    $data['kriteria'] = $this->Mtopsis->get_all_kriteria();
     $data['integritas'] = $this->Mtopsis->getIntegritasData();
-    $data['nilai_perbandingan'] = $nilai_perbandingan;
     $this->load->view('admin/dashboard/header');
     $this->load->view('admin/dashboard/sidebar');
-    $this->load->view('admin/data/tambahperbandingan', $data);
+    $this->load->view('admin/data/perbandinganberpasangan', $data);
+    $this->load->view('admin/dashboard/footer');
+  }
+
+  public function HitungPerbandingan()
+  {
+    $perbandingan = $this->input->post('perbandingan');
+    foreach ($perbandingan as $k1 => $row) {
+      foreach ($row as $k2 => $nilai) {
+        $this->Mtopsis->insert_perbandingan($k1, $k2, $nilai);
+      }
+    }
+    redirect('auth/tampil_perbandingan');
+  }
+
+  public function tampil_perbandingan()
+  {
+    $data['kriteria'] = $this->Mtopsis->get_all_kriteria();
+    $data['perbandingan'] = $this->Mtopsis->get_perbandingan();
+    $this->load->view('admin/dashboard/header');
+    $this->load->view('admin/dashboard/sidebar');
+    $this->load->view('admin/data/tampilperbandingan', $data);
     $this->load->view('admin/dashboard/footer');
   }
 
@@ -585,7 +587,6 @@ class Auth extends CI_Controller
       $matriks_perbandingan[$j][$i] = 1 / $nilai;
     }
 
-
     $total_kolom = array_fill(0, $n, 0);
     for ($j = 0; $j < $n; $j++) {
       for ($i = 0; $i < $n; $i++) {
@@ -593,14 +594,12 @@ class Auth extends CI_Controller
       }
     }
 
-
     $matriks_normalisasi = array_fill(0, $n, array_fill(0, $n, 0));
     for ($i = 0; $i < $n; $i++) {
       for ($j = 0; $j < $n; $j++) {
         $matriks_normalisasi[$i][$j] = $matriks_perbandingan[$i][$j] / $total_kolom[$j];
       }
     }
-
 
     $bobot_kriteria = array_fill(0, $n, 0);
     for ($i = 0; $i < $n; $i++) {
@@ -610,26 +609,28 @@ class Auth extends CI_Controller
       $bobot_kriteria[$i] /= $n;
     }
 
-
-    $lambda_max = 0;
+    $jumlah_baris = array_fill(0, $n, 0);
+    $nilai_eigen = array_fill(0, $n, 0);
     for ($i = 0; $i < $n; $i++) {
-      $sum = 0;
       for ($j = 0; $j < $n; $j++) {
-        $sum += $matriks_perbandingan[$i][$j] * $bobot_kriteria[$j];
+        $jumlah_baris[$i] += $matriks_normalisasi[$i][$j];
       }
-      $lambda_max += $sum / $bobot_kriteria[$i];
+      $nilai_eigen[$i] = $bobot_kriteria[$i] * $total_kolom[$i];
     }
-    $lambda_max /= $n;
 
+    $lambda_max = array_sum($nilai_eigen);
 
     $ci = ($lambda_max - $n) / ($n - 1);
     $ri_values = [0, 0, 0.58, 0.9, 1.12, 1.24, 1.32, 1.41, 1.45, 1.49];
     $ri = isset($ri_values[$n - 1]) ? $ri_values[$n - 1] : 0;
-    $cr = $ri != 0 ? $ci / $ri : 0;
+    $cr = ($ri != 0) ? $ci / $ri : 0;
 
     $data['kriteria'] = $kriteria;
     $data['bobot_kriteria'] = array_combine($id_kriteria_asli, $bobot_kriteria);
     $data['nilai_perbandingan'] = $nilai_perbandingan;
+    $data['matriks_normalisasi'] = $matriks_normalisasi;
+    $data['jumlah_baris'] = $jumlah_baris;
+    $data['nilai_eigen'] = $nilai_eigen;
     $data['ci'] = $ci;
     $data['cr'] = $cr;
     $data['ri'] = $ri;
@@ -639,6 +640,7 @@ class Auth extends CI_Controller
     $this->load->view('admin/data/hasilAHP', $data);
     $this->load->view('admin/dashboard/footer');
   }
+
 
 
   public function updateBobot()

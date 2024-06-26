@@ -432,4 +432,48 @@ class Mtopsis extends CI_Model
         $this->db->where('ID_Kriteria', $id_kriteria);
         $this->db->update('kriteria', $data);
     }
+    public function get_all_kriteria()
+    {
+        return $this->db->get('kriteria')->result_array();
+    }
+    public function insert_perbandingan($k1, $k2, $nilai)
+    {
+        $data = array(
+            'ID_Kriteria1' => $k1,
+            'ID_Kriteria2' => $k2,
+            'nilai' => $nilai
+        );
+        $this->db->insert('perbandingankriteria', $data);
+    }
+
+    public function get_perbandingan()
+    {
+        $kriteria = $this->db->get('kriteria')->result_array();
+        $perbandingan = [];
+
+        foreach ($kriteria as $k1) {
+            foreach ($kriteria as $k2) {
+                if ($k1['ID_Kriteria'] == $k2['ID_Kriteria']) {
+                    $perbandingan[$k1['ID_Kriteria']][$k2['ID_Kriteria']] = 1;
+                } else {
+                    $nilai = $this->get_nilai_perbandingan($k1['ID_Kriteria'], $k2['ID_Kriteria']);
+                    if ($nilai) {
+                        $perbandingan[$k1['ID_Kriteria']][$k2['ID_Kriteria']] = $nilai;
+                    } else {
+                        $perbandingan[$k1['ID_Kriteria']][$k2['ID_Kriteria']] = 1 / $this->get_nilai_perbandingan($k2['ID_Kriteria'], $k1['ID_Kriteria']);
+                    }
+                }
+            }
+        }
+
+        return $perbandingan;
+    }
+
+    public function get_nilai_perbandingan($k1, $k2)
+    {
+        $this->db->where('ID_Kriteria1', $k1);
+        $this->db->where('ID_Kriteria2', $k2);
+        $result = $this->db->get('perbandingankriteria')->row_array();
+        return $result ? $result['nilai'] : null;
+    }
 }

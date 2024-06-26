@@ -1,7 +1,7 @@
 <div class="container-fluid">
     <button class="btn btn-sm btn-primary mb-3" data-toggle="modal" data-target="#tambah_matrix"><i class="fas fa-plus fa-sm"></i>Tambah Penilaian</button>
 
-    <?php if ($this->session->flashdata('messagematrix')): ?>
+    <?php if ($this->session->flashdata('messagematrix')) : ?>
         <div class="alert alert-success">
             <?php echo $this->session->flashdata('messagematrix'); ?>
         </div>
@@ -16,17 +16,17 @@
             <th colspan="2" class="text-center">AKSI</th>
         </tr>
 
-        <?php 
+        <?php
         $no = 1;
         foreach ($matrix as $index => $eval) : ?>
             <tr>
                 <td><?php echo $no++ ?></td>
-                <td  style="display: none;"><?php echo $eval->ID_Matrix ?></td>
+                <td style="display: none;"><?php echo $eval->ID_Matrix ?></td>
                 <td><?php echo $eval->NamaKaryawan ?></td>
                 <td><?php echo $eval->NamaKriteria ?></td>
                 <td><?php echo $eval->Nilai ?></td>
-                <td><?php echo anchor('auth/editMatrixForm/'.$eval->ID_Matrix, '<div class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></div>') ?> edit</td>
-                <td><?php echo anchor('auth/deleteMatrix/'.$eval->ID_Matrix, '<div class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></div>') ?> hapus</td>
+                <td><?php echo anchor('auth/editMatrixForm/' . $eval->ID_Matrix, '<div class="btn btn-primary btn-sm"><i class="fa fa-edit"></i></div>') ?> edit</td>
+                <td><?php echo anchor('auth/deleteMatrix/' . $eval->ID_Matrix, '<div class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></div>') ?> hapus</td>
             </tr>
         <?php endforeach; ?>
     </table>
@@ -42,7 +42,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="<?php echo site_url('auth/insertMatrix')?>" method="post" enctype="multipart/form-data">
+                    <form action="<?php echo site_url('auth/insertMatrix') ?>" method="post" enctype="multipart/form-data">
                         <div class="form-group">
                             <label>Nama Karyawan</label>
                             <select name="id_karyawan" class="form-control">

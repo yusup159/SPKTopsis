@@ -19,7 +19,7 @@
 
                 <div class="form-floating">
                     <label for="floatingTextarea2">Definisi</label>
-                    <textarea class="form-control" name="definisi"  value="<?= $integritas->nilai_integritas; ?> " required id="floatingTextarea2" style="height: 100px"></textarea>
+                    <textarea class="form-control" name="definisi" value="<?= $integritas->nilai_integritas; ?> " required id="floatingTextarea2" style="height: 100px"></textarea>
                 </div>
 
         </div>
